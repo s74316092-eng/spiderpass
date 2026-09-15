@@ -19,7 +19,7 @@ screenGui.IgnoreGuiInset = true
 screenGui.Parent = playerGui
 
 local isMobile = UserInputService.TouchEnabled
-local PASSWORD = "spidergamepass"
+local PASSWORD_HASH = 1037434289
 
 local connections = {}
 local function connect(signal, callback)
@@ -288,9 +288,17 @@ getKeyBtn.MouseButton1Click:Connect(function()
     end
 end)
 
+local function simpleHash(str)
+    local hash = 5381
+    for i = 1, #str do
+        hash = ((hash * 33) + str:byte(i)) % 2147483647
+    end
+    return hash
+end
+
 local function checkPassword(txt)
-    local c = string.lower(string.gsub(string.gsub(txt, "^%s+", ""), "%s+$", ""))
-    return c == PASSWORD
+    local cleaned = string.lower(string.gsub(string.gsub(txt, "^%s+", ""), "%s+$", ""))
+    return simpleHash(cleaned) == PASSWORD_HASH
 end
 
 local modeWindow = Instance.new("Frame")
