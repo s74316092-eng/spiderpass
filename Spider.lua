@@ -19,7 +19,6 @@ screenGui.IgnoreGuiInset = true
 screenGui.Parent = playerGui
 
 local isMobile = UserInputService.TouchEnabled
-local PASSWORD_HASH = 1037434289
 
 local connections = {}
 local function connect(signal, callback)
@@ -87,8 +86,8 @@ local function hoverEffect(btn, activeBg, inactiveBg, activeStroke, inactiveStro
     scale.Scale = 1
     local uistroke = btn:FindFirstChildOfClass("UIStroke")
     local function valid()
-        return btn.Text == "BUY" or btn.Text == "VERIFY" or btn.Text == "GET KEY"
-            or btn.Text == "BUY ALL" or btn.Text == "AUTOMATIC" or btn.Text == "MANUAL"
+        return btn.Text == "BUY" or btn.Text == "BUY ALL"
+            or btn.Text == "AUTOMATIC" or btn.Text == "MANUAL"
     end
     btn.MouseEnter:Connect(function()
         if not valid() then return end
@@ -119,18 +118,6 @@ local function hoverEffect(btn, activeBg, inactiveBg, activeStroke, inactiveStro
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             TweenService:Create(scale, TweenInfo.new(0.15), {Scale = 1.04}):Play()
         end
-    end)
-end
-
-local function bindTextBoxFocus(box, activeBg, inactiveBg, activeStroke, inactiveStroke)
-    local s = box:FindFirstChildOfClass("UIStroke")
-    box.Focused:Connect(function()
-        TweenService:Create(box, TweenInfo.new(0.2), {BackgroundColor3 = activeBg}):Play()
-        if s and activeStroke then TweenService:Create(s, TweenInfo.new(0.2), {Color = activeStroke}):Play() end
-    end)
-    box.FocusLost:Connect(function()
-        TweenService:Create(box, TweenInfo.new(0.25), {BackgroundColor3 = inactiveBg}):Play()
-        if s and inactiveStroke then TweenService:Create(s, TweenInfo.new(0.25), {Color = inactiveStroke}):Play() end
     end)
 end
 
@@ -191,116 +178,9 @@ local function fireFakeSignal(kind, id)
     end
 end
 
-local keyWindow = Instance.new("Frame")
-keyWindow.Name = "KeySystem"
-keyWindow.Size = UDim2.new(0, 360, 0, 240)
-keyWindow.Position = UDim2.new(0.5, -180, 0.5, -120)
-keyWindow.BackgroundColor3 = Color3.fromRGB(16, 0, 0)
-keyWindow.BackgroundTransparency = 0.1
-keyWindow.BorderSizePixel = 0
-keyWindow.ClipsDescendants = true
-keyWindow.Parent = screenGui
-corner(keyWindow, 14)
-glowStroke(keyWindow, Color3.fromRGB(200, 0, 0), Color3.fromRGB(255, 50, 50), 1.5)
-
-local keyTitleText = Instance.new("TextLabel")
-keyTitleText.Size = UDim2.new(1, 0, 0, 50)
-keyTitleText.Position = UDim2.new(0, 0, 0, 12)
-keyTitleText.BackgroundTransparency = 1
-keyTitleText.Text = "Spider Authenticator"
-keyTitleText.TextSize = 18
-keyTitleText.Font = Enum.Font.GothamBold
-keyTitleText.Parent = keyWindow
-applyTextGradient(keyTitleText, Color3.fromRGB(200, 0, 0), Color3.fromRGB(255, 50, 50))
-
-local keySubText = Instance.new("TextLabel")
-keySubText.Size = UDim2.new(1, 0, 0, 20)
-keySubText.Position = UDim2.new(0, 0, 0, 55)
-keySubText.BackgroundTransparency = 1
-keySubText.Text = "Enter the password to access Spider"
-keySubText.TextColor3 = Color3.fromRGB(180, 100, 100)
-keySubText.TextSize = 11
-keySubText.Font = Enum.Font.Gotham
-keySubText.Parent = keyWindow
-
-local keyBox = Instance.new("TextBox")
-keyBox.Size = UDim2.new(0, 280, 0, 42)
-keyBox.Position = UDim2.new(0.5, -140, 0, 90)
-keyBox.BackgroundColor3 = Color3.fromRGB(30, 5, 5)
-keyBox.Text = ""
-keyBox.PlaceholderText = "Enter password..."
-keyBox.PlaceholderColor3 = Color3.fromRGB(150, 80, 80)
-keyBox.TextColor3 = Color3.fromRGB(255, 200, 200)
-keyBox.TextSize = 12
-keyBox.Font = Enum.Font.Code
-keyBox.BorderSizePixel = 0
-keyBox.ClipsDescendants = true
-keyBox.Parent = keyWindow
-corner(keyBox, 8)
-stroke(keyBox, Color3.fromRGB(150, 50, 50), 1)
-bindTextBoxFocus(keyBox, Color3.fromRGB(20, 0, 0), Color3.fromRGB(30, 5, 5), Color3.fromRGB(200, 0, 0), Color3.fromRGB(150, 50, 50))
-
-local verifyBtn = Instance.new("TextButton")
-verifyBtn.Size = UDim2.new(0, 120, 0, 36)
-verifyBtn.Position = UDim2.new(0.5, -130, 0, 155)
-verifyBtn.BackgroundColor3 = Color3.fromRGB(180, 0, 0)
-verifyBtn.Text = "VERIFY"
-verifyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-verifyBtn.TextSize = 13
-verifyBtn.Font = Enum.Font.GothamBold
-verifyBtn.BorderSizePixel = 0
-verifyBtn.Parent = keyWindow
-corner(verifyBtn, 8)
-stroke(verifyBtn, Color3.fromRGB(220, 50, 50), 1)
-
-local getKeyBtn = Instance.new("TextButton")
-getKeyBtn.Size = UDim2.new(0, 120, 0, 36)
-getKeyBtn.Position = UDim2.new(0.5, 5, 0, 155)
-getKeyBtn.BackgroundColor3 = Color3.fromRGB(30, 5, 5)
-getKeyBtn.Text = "GET KEY"
-getKeyBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
-getKeyBtn.TextSize = 13
-getKeyBtn.Font = Enum.Font.GothamBold
-getKeyBtn.BorderSizePixel = 0
-getKeyBtn.Parent = keyWindow
-corner(getKeyBtn, 8)
-stroke(getKeyBtn, Color3.fromRGB(150, 50, 50), 1)
-
-local infoLabel = Instance.new("TextLabel")
-infoLabel.Size = UDim2.new(1, 0, 0, 20)
-infoLabel.Position = UDim2.new(0, 0, 0, 205)
-infoLabel.BackgroundTransparency = 1
-infoLabel.Text = "Status: Awaiting password..."
-infoLabel.TextColor3 = Color3.fromRGB(180, 100, 100)
-infoLabel.TextSize = 10
-infoLabel.Font = Enum.Font.Gotham
-infoLabel.Parent = keyWindow
-
-hoverEffect(verifyBtn, Color3.fromRGB(220, 20, 20), Color3.fromRGB(180, 0, 0), Color3.fromRGB(255, 80, 80), Color3.fromRGB(220, 50, 50))
-hoverEffect(getKeyBtn, Color3.fromRGB(40, 10, 10), Color3.fromRGB(30, 5, 5), Color3.fromRGB(255, 50, 50), Color3.fromRGB(150, 50, 50))
-
-getKeyBtn.MouseButton1Click:Connect(function()
-    pcall(function() setclipboard("https://s74316092-eng.github.io/Spiderchave/") end)
-    transitionText(infoLabel, "Key link copied to clipboard!", Color3.fromRGB(255, 50, 50))
-    task.wait(2)
-    if infoLabel.Parent then
-        transitionText(infoLabel, "Status: Awaiting password...", Color3.fromRGB(180, 100, 100))
-    end
-end)
-
-local function simpleHash(str)
-    local hash = 5381
-    for i = 1, #str do
-        hash = ((hash * 33) + str:byte(i)) % 2147483647
-    end
-    return hash
-end
-
-local function checkPassword(txt)
-    local cleaned = string.lower(string.gsub(string.gsub(txt, "^%s+", ""), "%s+$", ""))
-    return simpleHash(cleaned) == PASSWORD_HASH
-end
-
+-- ============================================
+-- MODE SELECT (aparece direto)
+-- ============================================
 local modeWindow = Instance.new("Frame")
 modeWindow.Name = "ModeSelect"
 modeWindow.Size = UDim2.new(0, 360, 0, 220)
@@ -309,7 +189,6 @@ modeWindow.BackgroundColor3 = Color3.fromRGB(16, 0, 0)
 modeWindow.BackgroundTransparency = 0.1
 modeWindow.BorderSizePixel = 0
 modeWindow.ClipsDescendants = true
-modeWindow.Visible = false
 modeWindow.Parent = screenGui
 corner(modeWindow, 14)
 glowStroke(modeWindow, Color3.fromRGB(200, 0, 0), Color3.fromRGB(255, 50, 50), 1.5)
@@ -384,6 +263,9 @@ do
     end)
 end
 
+-- ============================================
+-- AUTO PANEL
+-- ============================================
 local panelSize = isMobile and UDim2.new(0.65, 0, 0.45, 0) or UDim2.new(0, 480, 0, 380)
 local fontSizeScale = isMobile and 0.8 or 1
 local buttonHeight = isMobile and 28 or 22
@@ -830,6 +712,9 @@ tabLogs.MouseButton1Click:Connect(function() switchTab("logs") end)
 tabProducts.MouseButton1Click:Connect(function() switchTab("products") end)
 switchTab("logs")
 
+-- ============================================
+-- MANUAL PANEL — Shop / Activation
+-- ============================================
 local manualPanel = Instance.new("Frame")
 manualPanel.Name = "ManualPanel"
 manualPanel.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -1322,6 +1207,9 @@ do
     end)
 end
 
+-- ============================================
+-- AUTO / MANUAL BUTTONS
+-- ============================================
 backFromAuto.MouseButton1Click:Connect(function()
     autoPanel.Visible = false
     modeWindow.Visible = true
@@ -1351,43 +1239,6 @@ do
         end
     end)
 end
-
-local function unlockScript()
-    transitionText(infoLabel, "Access Granted!", Color3.fromRGB(255, 50, 50))
-    task.wait(0.6)
-    TweenService:Create(keyWindow, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-        Size = UDim2.new(0, 360, 0, 0),
-        Position = UDim2.new(0.5, -180, 0.5, 0)
-    }):Play()
-    task.wait(0.4)
-    keyWindow:Destroy()
-    modeWindow.Visible = true
-    modeWindow.Size = UDim2.new(0, 0, 0, 0)
-    modeWindow.Position = UDim2.new(0.5, 0, 0.5, 0)
-    TweenService:Create(modeWindow, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-        Size = UDim2.new(0, 360, 0, 220),
-        Position = UDim2.new(0.5, -180, 0.5, -110)
-    }):Play()
-end
-
-verifyBtn.MouseButton1Click:Connect(function()
-    if checkPassword(keyBox.Text) then
-        unlockScript()
-    else
-        transitionText(infoLabel, "Access Denied! Invalid Password.", Color3.fromRGB(255, 50, 50))
-        local oldBg = keyBox.BackgroundColor3
-        local sBox = keyBox:FindFirstChildOfClass("UIStroke")
-        local oldS = sBox and sBox.Color
-        TweenService:Create(keyBox, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(50, 10, 10)}):Play()
-        if sBox then TweenService:Create(sBox, TweenInfo.new(0.2), {Color = Color3.fromRGB(255, 50, 50)}):Play() end
-        task.wait(1.5)
-        if keyBox.Parent then
-            TweenService:Create(keyBox, TweenInfo.new(0.3), {BackgroundColor3 = oldBg}):Play()
-            if sBox and oldS then TweenService:Create(sBox, TweenInfo.new(0.3), {Color = oldS}):Play() end
-            transitionText(infoLabel, "Status: Awaiting password...", Color3.fromRGB(180, 100, 100))
-        end
-    end
-end)
 
 autoBtn.MouseButton1Click:Connect(function()
     modeWindow.Visible = false
