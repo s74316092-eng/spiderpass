@@ -284,6 +284,29 @@ modeSub.Font = Enum.Font.Gotham
 modeSub.Parent = modeWindow
 regText(modeSub, "textDim")
 
+-- ============================================
+-- BOTÃO X (FECHAR TUDO) NO CANTO SUPERIOR DIREITO
+-- ============================================
+local closeAllBtn = Instance.new("TextButton")
+closeAllBtn.Name = "CloseAllBtn"
+closeAllBtn.Size = UDim2.new(0, 22, 0, 22)
+closeAllBtn.Position = UDim2.new(1, -6, 0, 6)
+closeAllBtn.AnchorPoint = Vector2.new(1, 0)
+closeAllBtn.BackgroundColor3 = Theme.bgLight
+closeAllBtn.Text = "X"
+closeAllBtn.TextColor3 = Theme.accent2
+closeAllBtn.TextSize = 11
+closeAllBtn.Font = Enum.Font.GothamBold
+closeAllBtn.BorderSizePixel = 0
+closeAllBtn.ZIndex = 10
+closeAllBtn.Parent = modeWindow
+corner(closeAllBtn, 999)
+local closeAllStroke = stroke(closeAllBtn, Theme.accent, 1)
+regFrame(closeAllBtn, "bgLight")
+regText(closeAllBtn, "accent2")
+regStroke(closeAllStroke, "accent")
+hoverEffect(closeAllBtn, "bgLight", "accent", "accent", "accent2", "accent2")
+
 local autoBtn = Instance.new("TextButton")
 autoBtn.Size = UDim2.new(0, 140, 0, 70)
 autoBtn.Position = UDim2.new(0.5, -150, 0, 100)
@@ -339,7 +362,7 @@ do
     local dragging, dragStart, startPos
     modeWindow.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            if input.Target == autoBtn or input.Target == manualBtn or input.Target == colorBtn then return end
+            if input.Target == autoBtn or input.Target == manualBtn or input.Target == colorBtn or input.Target == closeAllBtn then return end
             dragging = true
             dragStart = input.Position
             startPos = modeWindow.Position
@@ -1874,6 +1897,19 @@ manualBtn.MouseButton1Click:Connect(function()
     TweenService:Create(manualPanel, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
         Size = UDim2.new(0, 517, 0, 377)
     }):Play()
+end)
+
+-- ============================================
+-- BOTÃO X (FECHAR TUDO)
+-- ============================================
+closeAllBtn.MouseButton1Click:Connect(function()
+    closeAllBtn.Text = "..."
+    task.wait(0.15)
+    for _, c in ipairs(connections) do
+        if c.Connected then c:Disconnect() end
+    end
+    table.clear(connections)
+    pcall(function() screenGui:Destroy() end)
 end)
 
 connect(screenGui.AncestryChanged, function(_, parent)
