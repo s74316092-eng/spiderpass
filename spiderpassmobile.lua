@@ -330,12 +330,13 @@ regFrame(modeWindow, "bgDark")
 regGradient(modeStroke:FindFirstChildOfClass("UIGradient"), "accent", "accent2")
 
 local modeTitle = Instance.new("TextLabel")
-modeTitle.Size = UDim2.new(1, 0, 0, 26)
-modeTitle.Position = UDim2.new(0, 0, 0, 10)
+modeTitle.Size = UDim2.new(1, -50, 0, 26)
+modeTitle.Position = UDim2.new(0, 12, 0, 10)
 modeTitle.BackgroundTransparency = 1
 modeTitle.Text = "Select Mode"
 modeTitle.TextSize = 15
 modeTitle.Font = Enum.Font.GothamBold
+modeTitle.TextXAlignment = Enum.TextXAlignment.Left
 modeTitle.Parent = modeWindow
 regGradient(applyTextGradient(modeTitle, Theme.accent, Theme.accent2), "accent", "accent2")
 
@@ -400,6 +401,25 @@ regStroke(stroke(colorBtn, Theme.accent, 1), "accent")
 hoverEffect(colorBtn)
 
 makeDraggable(modeWindow, modeWindow)
+
+-- Botão X para fechar todo o script
+local modeClose = Instance.new("TextButton")
+modeClose.Size = UDim2.new(0, 22, 0, 22)
+modeClose.Position = UDim2.new(1, -6, 0, 5)
+modeClose.AnchorPoint = Vector2.new(1, 0)
+modeClose.BackgroundColor3 = Theme.bgLight
+modeClose.Text = "X"
+modeClose.TextColor3 = Theme.accent2
+modeClose.TextSize = 11
+modeClose.Font = Enum.Font.GothamBold
+modeClose.BorderSizePixel = 0
+modeClose.ZIndex = 10
+modeClose.Parent = modeWindow
+corner(modeClose, 999)
+regFrame(modeClose, "bgLight")
+regText(modeClose, "accent2")
+regStroke(stroke(modeClose, Theme.accent, 1), "accent")
+hoverEffect(modeClose)
 
 -- ============================================
 -- AUTO PANEL
@@ -524,7 +544,7 @@ corner(tabProducts, 0)
 regFrame(tabProducts, "bgMid")
 regText(tabProducts, "textDim")
 
--- Log área (com botão WIPE no topo da área de logs)
+-- Log área (com botão WIPE no topo)
 local logArea = Instance.new("Frame")
 logArea.Size = UDim2.new(1, -8, 1, -(26 + 4))
 logArea.Position = UDim2.new(0, 4, 0, 26 + 4)
@@ -532,7 +552,6 @@ logArea.BackgroundTransparency = 1
 logArea.BorderSizePixel = 0
 logArea.Parent = contentContainer
 
--- Barra de topo do log (apenas o botão WIPE)
 local logTopBar = Instance.new("Frame")
 logTopBar.Size = UDim2.new(1, 0, 0, 22)
 logTopBar.Position = UDim2.new(0, 0, 0, 0)
@@ -863,7 +882,6 @@ addLog = function(label, id, signalType)
 	eventCount = eventCount + 1
 end
 
--- Função de apagar todos os logs
 local function wipeAllLogs()
 	for _, c in ipairs(logScroll:GetChildren()) do
 		if c:IsA("Frame") and c.Name == "EntryLog" then
@@ -1568,7 +1586,8 @@ local function createColorEntry(label, key)
 	local nameLbl = Instance.new("TextLabel")
 	nameLbl.Size = UDim2.new(0, 110, 0, 12)
 	nameLbl.Position = UDim2.new(0, 8, 0, 4)
-	nameLbl.BackgroundTransparency = 1	nameLbl.Text = label
+	nameLbl.BackgroundTransparency = 1
+	nameLbl.Text = label
 	nameLbl.TextColor3 = Theme.text
 	nameLbl.TextSize = 10
 	nameLbl.Font = Enum.Font.GothamBold
@@ -1830,6 +1849,13 @@ manualBtn.MouseButton1Click:Connect(function()
 	TweenService:Create(manualPanel, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
 		Size = manualSize,
 	}):Play()
+end)
+
+-- Botão X do Mode Window: fecha todo o script
+modeClose.MouseButton1Click:Connect(function()
+	if screenGui then
+		screenGui:Destroy()
+	end
 end)
 
 connect(screenGui.AncestryChanged, function(_, parent)
