@@ -524,26 +524,59 @@ corner(tabProducts, 0)
 regFrame(tabProducts, "bgMid")
 regText(tabProducts, "textDim")
 
-local logArea = Instance.new("ScrollingFrame")
+-- Log área (com botão WIPE no topo da área de logs)
+local logArea = Instance.new("Frame")
 logArea.Size = UDim2.new(1, -8, 1, -(26 + 4))
 logArea.Position = UDim2.new(0, 4, 0, 26 + 4)
 logArea.BackgroundTransparency = 1
 logArea.BorderSizePixel = 0
-logArea.ScrollBarThickness = isMobile and 4 or 3
-logArea.ScrollBarImageColor3 = Theme.accent
-logArea.CanvasSize = UDim2.new(0, 0, 0, 0)
-logArea.AutomaticCanvasSize = Enum.AutomaticSize.Y
 logArea.Parent = contentContainer
 
-local listLayout = Instance.new("UIListLayout", logArea)
+-- Barra de topo do log (apenas o botão WIPE)
+local logTopBar = Instance.new("Frame")
+logTopBar.Size = UDim2.new(1, 0, 0, 22)
+logTopBar.Position = UDim2.new(0, 0, 0, 0)
+logTopBar.BackgroundTransparency = 1
+logTopBar.Parent = logArea
+
+local wipeLogsBtn = Instance.new("TextButton")
+wipeLogsBtn.Size = UDim2.new(0, 62, 0, 20)
+wipeLogsBtn.Position = UDim2.new(1, 0, 0, 0)
+wipeLogsBtn.AnchorPoint = Vector2.new(1, 0)
+wipeLogsBtn.BackgroundColor3 = Theme.bgLight
+wipeLogsBtn.Text = "WIPE"
+wipeLogsBtn.TextColor3 = Theme.accent2
+wipeLogsBtn.TextSize = 10
+wipeLogsBtn.Font = Enum.Font.GothamBold
+wipeLogsBtn.BorderSizePixel = 0
+wipeLogsBtn.Parent = logTopBar
+corner(wipeLogsBtn, 4)
+regFrame(wipeLogsBtn, "bgLight")
+regText(wipeLogsBtn, "accent2")
+regStroke(stroke(wipeLogsBtn, Theme.accent, 1), "accent")
+hoverEffect(wipeLogsBtn)
+
+local logScroll = Instance.new("ScrollingFrame")
+logScroll.Size = UDim2.new(1, 0, 1, -26)
+logScroll.Position = UDim2.new(0, 0, 0, 26)
+logScroll.BackgroundTransparency = 1
+logScroll.BorderSizePixel = 0
+logScroll.ScrollBarThickness = isMobile and 4 or 3
+logScroll.ScrollBarImageColor3 = Theme.accent
+logScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+logScroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
+logScroll.Parent = logArea
+
+local listLayout = Instance.new("UIListLayout", logScroll)
 listLayout.SortOrder = Enum.SortOrder.LayoutOrder
 listLayout.Padding = UDim.new(0, 4)
-local logPad = Instance.new("UIPadding", logArea)
+local logPad = Instance.new("UIPadding", logScroll)
 logPad.PaddingTop = UDim.new(0, 2)
 logPad.PaddingBottom = UDim.new(0, 2)
 logPad.PaddingLeft = UDim.new(0, 2)
 logPad.PaddingRight = UDim.new(0, 2)
 
+-- Área de produtos
 local productArea = Instance.new("ScrollingFrame")
 productArea.Size = UDim2.new(1, -8, 1, -(26 + 4))
 productArea.Position = UDim2.new(0, 4, 0, 26 + 4)
@@ -701,7 +734,7 @@ end)
 local eventCount = 0
 
 local function setEmpty(show)
-	local e = logArea:FindFirstChild("EmptyState")
+	local e = logScroll:FindFirstChild("EmptyState")
 	if show and not e then
 		local el = Instance.new("TextLabel")
 		el.Name = "EmptyState"
@@ -712,7 +745,7 @@ local function setEmpty(show)
 		el.TextSize = 10
 		el.Font = Enum.Font.GothamMedium
 		el.LayoutOrder = 99999
-		el.Parent = logArea
+		el.Parent = logScroll
 		regText(el, "textDim")
 	elseif not show and e then
 		e:Destroy()
@@ -765,7 +798,7 @@ addLog = function(label, id, signalType)
 	entry.BorderSizePixel = 0
 	entry.ClipsDescendants = true
 	entry.LayoutOrder = -eventCount
-	entry.Parent = logArea
+	entry.Parent = logScroll
 	corner(entry, 6)
 	local entryStroke = stroke(entry, Theme.accent, 1, 1)
 	regFrame(entry, "bgMid")
@@ -829,6 +862,28 @@ addLog = function(label, id, signalType)
 
 	eventCount = eventCount + 1
 end
+
+-- Função de apagar todos os logs
+local function wipeAllLogs()
+	for _, c in ipairs(logScroll:GetChildren()) do
+		if c:IsA("Frame") and c.Name == "EntryLog" then
+			c:Destroy()
+		end
+	end
+	eventCount = 0
+	setEmpty(true)
+end
+
+wipeLogsBtn.MouseButton1Click:Connect(function()
+	wipeAllLogs()
+	wipeLogsBtn.Text = "OK!"
+	wipeLogsBtn.TextColor3 = Color3.fromRGB(120, 230, 120)
+	task.wait(0.8)
+	if wipeLogsBtn.Parent then
+		wipeLogsBtn.Text = "WIPE"
+		wipeLogsBtn.TextColor3 = Theme.accent2
+	end
+end)
 
 if MarketplaceService then
 	connect(MarketplaceService.PromptProductPurchaseFinished, function(_, id)
@@ -1513,8 +1568,7 @@ local function createColorEntry(label, key)
 	local nameLbl = Instance.new("TextLabel")
 	nameLbl.Size = UDim2.new(0, 110, 0, 12)
 	nameLbl.Position = UDim2.new(0, 8, 0, 4)
-	nameLbl.BackgroundTransparency = 1
-	nameLbl.Text = label
+	nameLbl.BackgroundTransparency = 1	nameLbl.Text = label
 	nameLbl.TextColor3 = Theme.text
 	nameLbl.TextSize = 10
 	nameLbl.Font = Enum.Font.GothamBold
