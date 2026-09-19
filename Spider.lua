@@ -503,16 +503,48 @@ corner(tabProducts, 0)
 regFrame(tabProducts, "bgMid")
 regText(tabProducts, "textDim")
 
+-- ============================================
+-- CONTAINER DA ABA LOGS + BOTÃO CLEAR (canto superior direito)
+-- ============================================
+local logsContainer = Instance.new("Frame")
+logsContainer.Name = "LogsContainer"
+logsContainer.Size = UDim2.new(1, -12, 1, -(32 + 6))
+logsContainer.Position = UDim2.new(0, 6, 0, 32 + 6)
+logsContainer.BackgroundTransparency = 1
+logsContainer.BorderSizePixel = 0
+logsContainer.Parent = contentContainer
+
+-- Botão CLEAR fixo no canto superior direito
+local clearLogsBtn = Instance.new("TextButton")
+clearLogsBtn.Name = "ClearBtn"
+clearLogsBtn.Size = UDim2.new(0, 70, 0, 24)
+clearLogsBtn.Position = UDim2.new(1, -70, 0, 0)
+clearLogsBtn.BackgroundColor3 = Theme.bgMid
+clearLogsBtn.Text = "CLEAR"
+clearLogsBtn.TextColor3 = Theme.accent2
+clearLogsBtn.TextSize = 11 * fontSizeScale
+clearLogsBtn.Font = Enum.Font.GothamBold
+clearLogsBtn.BorderSizePixel = 0
+clearLogsBtn.ZIndex = 5
+clearLogsBtn.Parent = logsContainer
+corner(clearLogsBtn, 6)
+local clearLogsStroke = stroke(clearLogsBtn, Theme.accent, 1, 0.3)
+regFrame(clearLogsBtn, "bgMid")
+regText(clearLogsBtn, "accent2")
+regStroke(clearLogsStroke, "accent")
+hoverEffect(clearLogsBtn, "bgMid", "bgLight", "accent", "accent2", "accent2")
+
+-- Área de logs (fica abaixo do botão)
 local logArea = Instance.new("ScrollingFrame")
-logArea.Size = UDim2.new(1, -12, 1, -(32 + 6))
-logArea.Position = UDim2.new(0, 6, 0, 32 + 6)
+logArea.Size = UDim2.new(1, 0, 1, -28)
+logArea.Position = UDim2.new(0, 0, 0, 28)
 logArea.BackgroundTransparency = 1
 logArea.BorderSizePixel = 0
 logArea.ScrollBarThickness = isMobile and 4 or 3
 logArea.ScrollBarImageColor3 = Theme.accent
 logArea.CanvasSize = UDim2.new(0, 0, 0, 0)
 logArea.AutomaticCanvasSize = Enum.AutomaticSize.Y
-logArea.Parent = contentContainer
+logArea.Parent = logsContainer
 regFrame(logArea, "accent")
 
 local listLayout = Instance.new("UIListLayout", logArea)
@@ -697,6 +729,20 @@ local function setEmpty(show)
     elseif not show and e then e:Destroy() end
 end
 
+-- ============================================
+-- FUNÇÃO LIMPAR LOGS
+-- ============================================
+local function clearAllLogs()
+    for _, c in ipairs(logArea:GetChildren()) do
+        if c.Name == "EntryLog" then
+            c:Destroy()
+        end
+    end
+    entries = {}
+    eventCount = 0
+    setEmpty(true)
+end
+
 local function makeSmallBtn(parent)
     local b = Instance.new("TextButton")
     b.Size = UDim2.new(0, 48, 0, buttonHeight)
@@ -825,20 +871,32 @@ end)
 
 setEmpty(true)
 
+-- ============================================
+-- CONEXÃO DO BOTÃO CLEAR
+-- ============================================
+clearLogsBtn.MouseButton1Click:Connect(function()
+    clearAllLogs()
+    clearLogsBtn.Text = "CLEARED!"
+    task.wait(0.8)
+    if clearLogsBtn.Parent then
+        clearLogsBtn.Text = "CLEAR"
+    end
+end)
+
 local function switchTab(t)
     if t == "logs" then
         tabLogs.BackgroundColor3 = Theme.bgLight
         tabLogs.TextColor3 = Theme.text
         tabProducts.BackgroundColor3 = Theme.bgMid
         tabProducts.TextColor3 = Theme.textDim
-        logArea.Visible = true
+        logsContainer.Visible = true
         productArea.Visible = false
     else
         tabProducts.BackgroundColor3 = Theme.bgLight
         tabProducts.TextColor3 = Theme.text
         tabLogs.BackgroundColor3 = Theme.bgMid
         tabLogs.TextColor3 = Theme.textDim
-        logArea.Visible = false
+        logsContainer.Visible = false
         productArea.Visible = true
     end
 end
